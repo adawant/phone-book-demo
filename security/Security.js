@@ -20,7 +20,7 @@ exports.getExpirationTime = () => jwtExpireTime;
 exports.enable = app => app.use(
     express_jwt({
         secret: jwtSecret,
-        getToken: req => req.cookies.token
+        getToken: req => req.headers["x-auth"]
     })
 );
 
@@ -38,11 +38,11 @@ exports.login = async (user, password) => {
     let tries;
     if (result.badUser || result.badPassword) {
         const nFailure = result.failures + 1;
-        UserDao.denyLogin(user, nFailure);
+        await UserDao.denyLogin(user, nFailure);
         await sleep(waitFactor * (nFailure - 1));
         tries = result.failures > failureThreshold ? 0 : failureThreshold - result.failures;
     } else {
-        UserDao.confirmLogin(user);
+        await UserDao.confirmLogin(user);
         tries = failureThreshold;
     }
     return {

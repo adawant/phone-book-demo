@@ -13,7 +13,6 @@ mongoose.connect(process.env.DATABASE_URL).catch(e => {
 const contactsController = require("./controller/ContactsController");
 const usersController = require("./controller/UsersController");
 
-const cookieParser = require('cookie-parser');
 const Security = require("./security/Security")
 
 const PORT = 3001;
@@ -37,14 +36,6 @@ app.post("/signup", usersController.signUp);
  * LOGIN USER
  */
 app.post("/login", usersController.login);
-
-
-app.use(cookieParser());
-
-/**
- * LOGOUT THE USER
- */
-app.get("/logout", usersController.logout)
 
 
 Security.enable(app);

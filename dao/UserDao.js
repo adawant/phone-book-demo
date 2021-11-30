@@ -15,11 +15,13 @@ const userSchema = new mongoose.Schema({
     lastFailure: {type: Date, required: false}
 })
 
-const UserModel = mongoose.model("UserModel", userSchema)
+const UserModel = mongoose.model("users", userSchema)
 
 exports.checkCredentials = async (userId, password) => {
     const dbUser = await UserModel.findById(userId)
-    if (dbUser == null) return {badUser: true, badPassword: true, failures: 0};
+    if (dbUser == null) {
+        return {badUser: true, badPassword: true, failures: 0};
+    }
     return {
         badUser: false,
         badPassword: !compareDigests(password, dbUser.password),
