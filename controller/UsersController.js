@@ -1,8 +1,6 @@
 const Security = require("../security/Security")
 const UserDao = require("../dao/UserDao")
 
-//TODO PASSWORD RESET
-
 exports.login = (req, resp) => {
     const user = req.body.userId;
     const password = req.body.password;

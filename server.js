@@ -15,7 +15,7 @@ const usersController = require("./controller/UsersController");
 
 const Security = require("./security/Security")
 
-const PORT = 3001;
+const PORT = 8080;
 
 const app = express();
 
@@ -49,13 +49,13 @@ const contextPath = "/contacts"
 /**
  * Create a contact, returns its ID.
  */
-app.post(contextPath, /*TODO VALIDATION*/ contactsController.saveContact);
+app.post(contextPath, contactsController.saveContact);
 
 
 /**
  * Patch a contact
  */
-app.patch(contextPath + "/:id", /*TODO VALIDATION*/ contactsController.updateContact);
+app.patch(contextPath + "/:id", contactsController.updateContact);
 
 /**
  * Delete a contact
@@ -68,13 +68,13 @@ app.get(contextPath + "/:id", contactsController.getContactById);
 /**
  * Get the contacts paged and sorted
  */
-app.get(contextPath, /*TODO PAGED PARAMETERS VALIDATION*/ contactsController.getContacts);
+app.get(contextPath, contactsController.getContacts);
 
 
 //////////////////////////////////////////////////////////
 
 function customErrors(err, req, res, next) {
-    res.status(err.status).json(err.message);
+    res.status(err.status || 500).json(err.message);
 }
 
 app.use(customErrors);

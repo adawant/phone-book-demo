@@ -36,7 +36,7 @@ const contactSchema = new mongoose.Schema({
 
 const ContactModel = mongoose.model("contacts", contactSchema)
 
-exports.save = async (contactDetail) => {
+exports.save = (contactDetail) => {
     const contact = new ContactModel({
         userOwnerId: contactDetail.userOwnerId,
         name: contactDetail.name,
@@ -45,8 +45,41 @@ exports.save = async (contactDetail) => {
         email: contactDetail.email,
         address: contactDetail.address
     })
+    return contact.save().then(_ => contact.id)
+}
+
+exports.partialUpdate = async (id, contactDetail) => {
+    const contact = await ContactModel.findById(id)
+    if (contact == null)
+        return null
+
+    if (contactDetail.name != null)
+        contact.name = contactDetail.name
+
+    if (contactDetail.surname != null)
+        contact.surname = contactDetail.surname
+
+    if (contactDetail.email != null)
+        contact.email = contactDetail.email
+
+    if (contactDetail.address != null)
+        contact.address = contactDetail.address
+
+    if (contactDetail.phoneNumbers != null) {
+        contactDetail.phoneNumbers.map(it => {
+            return {
+                old: contact.phoneNumbers.find(e => e.number === it.number),
+                new: it
+            }
+        }).forEach(it => {
+            if (!it.old)
+                contact.phoneNumbers.push(it.new)
+            else it.old.numberType = it.new.numberType
+        })
+    }
+
     await contact.save()
-    return contact.id
+    return contact
 }
 
 exports.delete = async contactId => {
@@ -55,9 +88,36 @@ exports.delete = async contactId => {
     return contact
 }
 
-exports.get = async contactId => {
-    return ContactModel.findById(contactId);
-}
+exports.get = contactId => ContactModel.findById(contactId);
 
+
+exports.getAllPaged = (ownerId, pagination) => {
+    pagination.size = pagination.size || 10
+    pagination.page = pagination.page || 0
+    const filter = {
+        userOwnerId: ownerId,
+    }
+    if (pagination.sortedKey) {
+
+    }
+    let findProcedure = ContactModel.find(filter)
+        .limit(pagination.size)
+        .skip(pagination.size * pagination.page);
+    if (pagination.sortedKey) {
+        const sort = {}
+        if (!pagination.sorted || (pagination.sorted !== "asc" && pagination.sorted !== "desc"))
+            pagination.sorted = "asc"
+        findProcedure = findProcedure.sort(sort)
+    } else pagination.sorted = undefined
+    return findProcedure.then(c => {
+        return {
+            page: pagination.page,
+            size: pagination.size,
+            sortedKey: pagination.sortedKey,
+            sorted: pagination.sorted,
+            content: c
+        }
+    })
+}
 
 
