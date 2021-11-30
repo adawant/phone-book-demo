@@ -1,6 +1,7 @@
 const Security = require("../security/Security")
 const UserDao = require("../dao/UserDao")
 
+//TODO PASSWORD RESET
 
 exports.login = (req, resp) => {
     const user = req.body.userId;
@@ -13,11 +14,7 @@ exports.login = (req, resp) => {
                 resp.status(401).json(loginResult);
             else {
                 const token = Security.sign({userId: user});
-                resp.cookie('token', token, {
-                    httpOnly: true,
-                    sameSite: true,
-                    maxAge: 1000 * Security.getExpirationTime()
-                }).status(200).end();
+                resp.status(200).json({token: token});
             }
         }
     }).catch(err => resp.status(500).json(err));
@@ -34,6 +31,7 @@ exports.signUp = (req, resp) => {
         name: name,
         surname: surname,
         password: password
-    }).then(userId => resp.json({userId: userId})).catch(err => resp.status(500).json(err));
+    }).then(userId => resp.json({userId: userId}))
+        .catch(err => resp.status(500).json(err));
 
 };

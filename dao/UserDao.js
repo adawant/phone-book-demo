@@ -2,35 +2,55 @@
  * PASSWORDS ARE STORED IN SHA-256 DIGEST
  */
 const digestModule = require('bcrypt');
-const {v4: uuidv4} = require('uuid');
 const compareDigests = digestModule.compareSync;
 const createDigest = data => digestModule.hashSync(data, digestModule.genSaltSync());
 
-const jspa = require("./JSPA");
+const mongoose = require('mongoose')
 
-exports.checkCredentials = async (user, password) => {
-    const dbUser = await jspa.find("Users", {userId: user});
-    if (Object.entries(dbUser).length === 0) return {badUser: true, badPassword: true};
+const userSchema = new mongoose.Schema({
+    name: {type: String, required: true},
+    surname: {type: String, required: true},
+    password: {type: String, required: true},
+    failures: {type: Number, required: false, default: 0},
+    lastFailure: {type: Date, required: false}
+})
+
+const UserModel = mongoose.model("UserModel", userSchema)
+
+exports.checkCredentials = async (userId, password) => {
+    const dbUser = await UserModel.findById(userId)
+    if (dbUser == null) return {badUser: true, badPassword: true, failures: 0};
     return {
         badUser: false,
-        badPassword: !compareDigests(password, dbUser.password, password),
+        badPassword: !compareDigests(password, dbUser.password),
         failures: dbUser.failures,
-        lastFailure: new Date(dbUser.lastFailure || 0)
+        lastFailure: dbUser.lastFailure || 0
     }
 }
-exports.confirmLogin = user => jspa.update("Users", {userId: user}, {failures: 0});
+exports.confirmLogin = async userId => {
+    const user = await UserModel.findById(userId)
+    user.failures = 0
+    await user.save()
+}
 
-exports.denyLogin = (user, failureTime) => jspa.update("Users", {userId: user}, {
-    lastFailure: new Date().getTime(),
-    failures: failureTime
-});
+exports.denyLogin = async (userId, failureTime) => {
+    const user = await UserModel.findById(userId)
+    if (user == null)
+        return
+    user.lastFailure = new Date()
+    user.failures = failureTime
+    await user.save()
+}
 
 
-exports.exists = (userID) => jspa.exists("Users", {userId: userID});
+exports.exists = (userID) => UserModel.exists(userID)
 
-exports.save = (userDetail) => jspa.save("Users", {
-    name: userDetail.name,
-    surname: userDetail.surname,
-    password: createDigest(userDetail.password),
-    userId: uuidv4()
-})
+exports.save = async (userDetail) => {
+    const user = new UserModel({
+        name: userDetail.name,
+        surname: userDetail.surname,
+        password: createDigest(userDetail.password),
+    })
+    await user.save()
+    return user.id
+}

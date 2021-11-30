@@ -1,7 +1,16 @@
 'use strict'
+require('dotenv').config()
+
 const express = require('express');
 const logger = require('morgan');
-const contactsController = require("./controller/ContactController");
+
+const mongoose = require('mongoose')
+mongoose.connect(process.env.DATABASE_URL).catch(e => {
+    console.log(`Error connecting to db: ${e.message}`)
+    process.exit(-1)
+})
+
+const contactsController = require("./controller/ContactsController");
 const usersController = require("./controller/UsersController");
 
 const cookieParser = require('cookie-parser');
@@ -49,26 +58,26 @@ const contextPath = "/contacts"
 /**
  * Create a contact, returns its ID.
  */
-app.post(contextPath, /*TODO VALIDATION*/ contactController.saveContact);
+app.post(contextPath, /*TODO VALIDATION*/ contactsController.saveContact);
 
 
 /**
  * Patch a contact
  */
-app.patch(contacts + "/:id", /*TODO VALIDATION*/ contactController.updateContact);
+app.patch(contextPath + "/:id", /*TODO VALIDATION*/ contactsController.updateContact);
 
 /**
  * Delete a contact
  */
-app.delete(contacts + "/:id", contactController.deleteContact);
+app.delete(contextPath + "/:id", contactsController.deleteContact);
 
 
-app.get(contacts + "/:id", contactController.getContactById);
+app.get(contextPath + "/:id", contactsController.getContactById);
 
 /**
  * Get the contacts paged and sorted
  */
-app.get(contextPath, /*TODO PAGED PARAMETERS VALIDATION*/ contactController.getContacts);
+app.get(contextPath, /*TODO PAGED PARAMETERS VALIDATION*/ contactsController.getContacts);
 
 
 //////////////////////////////////////////////////////////
