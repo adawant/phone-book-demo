@@ -1,7 +1,9 @@
 'use strict'
 const express = require('express');
 const logger = require('morgan');
-const controller = require("./controller/ContactController");
+const contactsController = require("./controller/ContactController");
+const usersController = require("./controller/UsersController");
+
 const cookieParser = require('cookie-parser');
 const Security = require("./security/Security")
 
@@ -19,13 +21,13 @@ app.use(express.json());
 /**
  * CREATE USER
  */
-app.post("/signup", controller.signup);
+app.post("/signup", usersController.signUp);
 
 
 /**
  * LOGIN USER
  */
-app.post("/login", controller.login);
+app.post("/login", usersController.login);
 
 
 app.use(cookieParser());
@@ -33,7 +35,7 @@ app.use(cookieParser());
 /**
  * LOGOUT THE USER
  */
-app.get("/logout", controller.logout)
+app.get("/logout", usersController.logout)
 
 
 Security.enable(app);
@@ -47,26 +49,26 @@ const contextPath = "/contacts"
 /**
  * Create a contact, returns its ID.
  */
-app.post(contextPath, /*TODO VALIDATION*/ controller.saveContact);
+app.post(contextPath, /*TODO VALIDATION*/ contactController.saveContact);
 
 
 /**
  * Patch a contact
  */
-app.patch(contacts + "/:id", /*TODO VALIDATION*/ controller.updateContact);
+app.patch(contacts + "/:id", /*TODO VALIDATION*/ contactController.updateContact);
 
 /**
  * Delete a contact
  */
-app.delete(contacts + "/:id", controller.deleteContact);
+app.delete(contacts + "/:id", contactController.deleteContact);
 
 
-app.get(contacts + "/:id", controller.getContactById);
+app.get(contacts + "/:id", contactController.getContactById);
 
 /**
  * Get the contacts paged and sorted
  */
-app.get(contextPath, /*TODO PAGED PARAMETERS VALIDATION*/ controller.getContacts);
+app.get(contextPath, /*TODO PAGED PARAMETERS VALIDATION*/ contactController.getContacts);
 
 
 //////////////////////////////////////////////////////////
