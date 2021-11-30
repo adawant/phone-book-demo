@@ -1,0 +1,33 @@
+{
+  "name": "phone-book-demo",
+  "version": "1.0.0",
+  "description": "Phone book demo",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://adawant@github.com/adawant/phone-book-demo.git"
+  },
+  "author": "Schiopu Andrei",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adawant/phone-book-demo/issues"
+  },
+  "homepage": "https://github.com/adawant/phone-book-demo#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "js-sha256": "^0.9.0",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.4",
+    "sqlite3": "^4.2.0"
+  },
+  "devDependencies": {
+    "bcrypt": "^5.0.0",
+    "cookie-parser": "^1.4.5",
+    "express-jwt": "^5.3.3",
+    "express-validator": "^6.5.0",
+    "jsonwebtoken": "^8.5.1"
+  }
+}
