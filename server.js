@@ -9,6 +9,8 @@ const PORT = 8080;
 
 const app = express();
 
+module.exports = app
+
 app.use(logger('dev'));
 app.use(express.json());
 
@@ -39,4 +41,7 @@ app.use(customErrors);
 
 db.connect().then(_ =>
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}/`))
-).catch(() => process.exit(-1))
+).catch((e) => {
+    console.log("Error connecting to db: " + e.message)
+    process.exit(-1)
+})

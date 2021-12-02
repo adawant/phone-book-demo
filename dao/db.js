@@ -4,20 +4,34 @@ const mongoose = require('mongoose')
 
 exports.connect = () => {
     return new Promise((resolve, reject) => {
-        mongoose.connect(process.env.DATABASE_URL)
-            .then((res, err) => {
-                if (err)
-                    handleError(err, reject)
-                else {
-                    console.log("Connection to db succeed")
-                    resolve()
-                }
-            })
-            .catch(e => handleError(e, reject))
+        if (process.env.NODE_ENV === "test") {
+            console.log("Mocking mongo database")
+            const Mockgoose = require('mockgoose').Mockgoose
+            const instance = new Mockgoose(mongoose)
+            instance.prepareStorage()
+                .then(() => {
+                    doConnect(resolve, reject)
+                })
+
+        } else {
+            doConnect(resolve, reject)
+        }
     })
 }
 
-const handleError = (error, reject) => {
-    console.log(`Error connecting to db: ${e.message}`)
-    reject(e)
+function doConnect(resolve, reject) {
+    mongoose.connect(process.env.DATABASE_URL)
+        .then((res, err) => {
+            if (err)
+                reject(err)
+            else {
+                console.log("Connection to db succeed")
+                resolve()
+            }
+        })
+        .catch(e => reject(e))
 }
+
+exports.disconnect = () => mongoose.disconnect()
+
+
