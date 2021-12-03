@@ -21,7 +21,7 @@ const UserModel = mongoose.model("users", userSchema)
 exports.checkCredentials = async (userId, password) => {
     if (!isValidObjectId(userId))
         return {badUser: true, badPassword: true, failures: 0};
-    
+
     const dbUser = await UserModel.findById(userId)
     if (dbUser == null) {
         return {badUser: true, badPassword: true, failures: 0};

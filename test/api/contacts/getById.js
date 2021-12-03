@@ -28,7 +28,7 @@ describe('GET /contacts/:id', () => {
     })
 
 
-    it('Only logged user contacts', (done) => {
+    it('Only logged user get', (done) => {
         authenticate(app).then(token => {
             const exampleContact = {
                 name: "test",

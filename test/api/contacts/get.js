@@ -29,7 +29,7 @@ describe('GET /contacts', () => {
     })
 
 
-    it('Only logged user contacts', (done) => {
+    it('Only logged user get all', (done) => {
         authenticate(app).then(token => {
             doGet(token).then(r => {
                 expectPagedResult(r.body, 0)
