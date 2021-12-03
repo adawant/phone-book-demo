@@ -1,4 +1,5 @@
 const ContactDao = require("../dao/ContactDao")
+const {update} = require("../dao/ContactDao");
 
 const extractContactDetailsFromRequest = req => {
     return {
@@ -27,12 +28,19 @@ exports.saveContact = (req, resp) => {
 };
 
 
-exports.updateContact = async (req, resp) => {
+exports.patchContact = (req, resp) =>
+    doUpdateContact(req, resp, (id, contact) => ContactDao.partialUpdate(req.params.id, contact), "Patching")
+
+exports.updateContact = (req, resp) =>
+    doUpdateContact(req, resp, (id, contact) => ContactDao.update(req.params.id, contact), "Updating")
+
+
+const doUpdateContact = async (req, resp, updateCallback, title) => {
     const contactDetail = extractContactDetailsFromRequest(req)
-    console.log("Updating contact " + req.params.id + " with " + JSON.stringify(contactDetail))
+    console.log(title + " contact " + req.params.id + " with " + JSON.stringify(contactDetail))
     const contact = await checkUserAllowed(req.params.id, req, resp)
     if (contact != null)
-        ContactDao.partialUpdate(req.params.id, contactDetail).then(c => {
+        updateCallback(req.params.id, contactDetail).then(c => {
             console.log("Contact " + req.params.id + " saved");
             return c;
         }).then(c => resp.status(200).json(c))

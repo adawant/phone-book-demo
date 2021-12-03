@@ -49,6 +49,12 @@ exports.save = (contactDetail) => {
     return contact.save().then(_ => contact.id)
 }
 
+exports.update = async (id, contactDetail) => {
+    await ContactModel.findOneAndReplace({"_id": id}, contactDetail)
+    return ContactModel.findById(id);
+}
+
+
 exports.partialUpdate = async (id, contactDetail) => {
     const contact = await ContactModel.findById(id)
     if (contact == null)
