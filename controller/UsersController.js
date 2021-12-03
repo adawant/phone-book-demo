@@ -11,7 +11,7 @@ exports.login = (req, resp) => {
             resp.status(429).json(loginResult);
         } else {
             if (loginResult.badUser || loginResult.badPassword) {
-                console.log("User " + user + " denid logging in:" + JSON.stringify(loginResult))
+                console.log("User " + user + " denied logging in:" + JSON.stringify(loginResult))
                 resp.status(401).json(loginResult);
             } else {
                 console.log("User " + user + " logged in")

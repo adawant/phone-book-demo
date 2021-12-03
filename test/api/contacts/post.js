@@ -8,24 +8,11 @@ const app = require('../../../server')
 const db = require('../../../dao/db')
 
 describe('POST /contacts', () => {
-    before(() => {
-        db.connect().then(() => {
-            done()
-        }).catch(err => (done(err)))
-    })
-
-
     //////////////////////////////////
     // TEST BASIC USER CREATION WITH AND WITHOUT AUTH
     //////////////////////////////////
 
     it('User creation', (done) => {
-        function performCall(body, token) {
-            let basicRequest = request(app).post("/contacts")
-            if (token)
-                basicRequest = basicRequest.set({"x-auth": token})
-            return basicRequest.send(body)
-        }
 
         const body = {
             name: "test",
@@ -35,16 +22,24 @@ describe('POST /contacts', () => {
             }]
         }
 
-        performCall(body).then((response) => {
+        doPost(body).then((response) => {
             expect(response.status).equal(401)
             authenticate(app).then(token => {
-                performCall(body, token).then(r => {
+                doPost(body, token).then(r => {
                     const body = r.body
                     expect(body).to.contain.property('contactId')
-                    done()
+
+                    const body2 = { //no phone numbers, only name. Phones let you do this
+                        name: "test"
+                    }
+                    doPost(body2, token).then(r => {
+                        const body = r.body
+                        expect(body).to.contain.property('contactId')
+                        done()
+                    }).catch(e => done(e))
                 }).catch(e => done(e))
-            })
-        })
+            }).catch(e => done(e))
+        }).catch(e => done(e))
     })
 
     //////////////////////////////////
@@ -65,22 +60,28 @@ describe('POST /contacts', () => {
                     numberType: "mobile"
                 }]
             }
-            doTestWrongBodie(token, [body1, body2])
+            const body3 = {
+                randomKey: "a value"
+            }
+            doTestWrongBodies(token, [body1, body2, body3])
                 .then(() => done())
                 .catch(e => done(e))
-        })
+        }).catch(e => done(e))
 
 
-        async function doTestWrongBodie(token, bodies) {
-            for (let body in bodies) {
-                const response = await performCall(body, token)
+        async function doTestWrongBodies(token, bodies) {
+            for (let body of bodies) {
+                const response = await doPost(body, token)
                 expect(response.status).equal(400)
             }
         }
     })
 
-
-    after(() => {
-        db.disconnect().then(() => done()).catch(err => (done(err)))
-    })
 })
+
+function doPost(body, token) {
+    let basicRequest = request(app).post("/contacts")
+    if (token)
+        basicRequest = basicRequest.set({"x-auth": token})
+    return basicRequest.send(body)
+}

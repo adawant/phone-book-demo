@@ -112,7 +112,7 @@ exports.getAllPaged = (ownerId, pagination) => {
     return findProcedure.then(c => {
         return {
             page: pagination.page,
-            size: pagination.size,
+            size: c.length,
             sortedKey: pagination.sortedKey,
             sorted: pagination.sorted,
             content: c
