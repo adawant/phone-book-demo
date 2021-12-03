@@ -6,6 +6,7 @@ const compareDigests = digestModule.compareSync;
 const createDigest = data => digestModule.hashSync(data, digestModule.genSaltSync());
 
 const mongoose = require('mongoose')
+const {isValidObjectId} = require("mongoose");
 
 const userSchema = new mongoose.Schema({
     name: {type: String, required: true},
@@ -18,6 +19,9 @@ const userSchema = new mongoose.Schema({
 const UserModel = mongoose.model("users", userSchema)
 
 exports.checkCredentials = async (userId, password) => {
+    if (!isValidObjectId(userId))
+        return {badUser: true, badPassword: true, failures: 0};
+    
     const dbUser = await UserModel.findById(userId)
     if (dbUser == null) {
         return {badUser: true, badPassword: true, failures: 0};
@@ -56,3 +60,5 @@ exports.save = async (userDetail) => {
     await user.save()
     return user.id
 }
+
+exports.isValidId = id => mongoose.isValidObjectId(id)

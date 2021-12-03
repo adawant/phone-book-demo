@@ -78,10 +78,18 @@ exports.getContacts = (req, resp) => {
 }
 
 const checkUserAllowed = async (resourceId, req, resp) => {
+    function notFound() {
+        console.log('Contact id ' + resourceId + " is not compliant")
+        resp.status(404).json({message: "Contact not found"})
+    }
+
+    if (!ContactDao.isValidId(resourceId)) {
+        notFound()
+        return null
+    }
     const contact = await ContactDao.get(resourceId)
     if (contact == null) {
-        console.log('Contact with id ' + resourceId + " not found")
-        resp.status(404).json({message: "Contact not found"})
+        notFound()
         return null
     } else if (contact.userOwnerId !== req.user.userId) {
         console.log('User ' + req.user.userId + " is not the owner of " + resourceId)

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const {mongo} = require("mongoose");
 
 const contactSchema = new mongoose.Schema({
     userOwnerId: String,
@@ -120,4 +121,4 @@ exports.getAllPaged = (ownerId, pagination) => {
     })
 }
 
-
+exports.isValidId = id => mongoose.isValidObjectId(id)
