@@ -8,7 +8,7 @@ const app = require('../../../server')
 const db = require('../../../dao/db')
 
 
-describe('GET /contacts/:id', () => {
+describe('DELETE /contacts/:id', () => {
 
 
     //////////////////////////////////
