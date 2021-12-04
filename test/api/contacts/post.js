@@ -1,4 +1,4 @@
-// process.env.NODE_ENV = "test"
+process.env.NODE_ENV = "test"
 const expect = require('chai').expect
 const request = require('supertest')
 
@@ -19,7 +19,9 @@ describe('POST /contacts', () => {
             phoneNumbers: [{
                 number: "00",
                 numberType: "mobile"
-            }]
+            }],
+            email: "a@b.com",
+            address: "here"
         }
 
         doPost(body).then((response) => {
