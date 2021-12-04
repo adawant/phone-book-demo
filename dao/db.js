@@ -11,8 +11,7 @@ exports.connect = () => {
             instance.prepareStorage()
                 .then(() => {
                     doConnect(resolve, reject)
-                })
-
+                }).catch(ex => reject(ex))
         } else {
             doConnect(resolve, reject)
         }
